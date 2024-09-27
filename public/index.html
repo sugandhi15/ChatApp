@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iChat - Realtime Chat Application Node and Socket.Io </title>
+    <link rel="stylesheet" href="style/style.css">
+    <style>
+        *{
+    margin: 0%;
+    padding: 0%;
+}
+
+#body{
+    height:100vh;
+    background-image: linear-gradient(rgb(63, 27, 52), rgb(101, 38, 114),black)
+}
+nav{
+    height: 7vh;
+    display: flex;
+    justify-content: start;align-items: center;
+    /* background-color: black; */
+}
+h1{
+    color: red;
+}
+img{
+    height: 7vh;
+    margin-left: 3vw;
+}
+.container{
+    padding: 2vh;
+    height: 70vh;
+    width: 50vw;
+    margin: auto;
+    /* background-color: red; */
+    overflow-y: auto;
+    margin-bottom: 4vh;
+    border: 1px solid black;
+    border-radius: 10px;
+}
+.message{
+    margin-top: 1vh;
+    border: 2px solid black;
+    width: 20vw;
+    background-color: rgb(179, 179, 178);
+    padding: 7px;
+    border-radius: 10px;
+}
+/* we can use flex also to do right and left */
+.left{
+    float: left;
+    clear: both;
+}
+.right{
+    float: right;
+    clear: both;
+}
+#send-container{
+    display: block;
+    margin: auto;
+    max-width: 52vw;
+    width: 100%;
+    text-align: center;
+}
+#messageInp{
+    width: 42vw;
+    height: 7vh;
+    padding-left: 0.5vw;
+    float: left;
+    border: 1px solid black;
+    border-radius: 10px;
+    /* border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px; */
+}
+.btn{
+    height: 7vh;
+    width: 9vw;
+    border-radius: 10px;
+    /* border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px; */
+}
+
+    </style>
+</head>
+<body>
+    <div id="body">
+    <nav>
+        <img src="logo1.png">
+        <h1>Chit-Chat</h1>
+    </nav>
+    <div class="container">
+    </div>
+    <div class="send">
+        <form action="#" id="send-container">
+            <input type="text" placeholder="Message" id="messageInp" >
+            <button class="btn" type="submit">Send</button>
+        </form>
+    </div>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <!-- <script defer src="./js/client.js"></script> -->
+    <script>
+var socket = io();
+
+const form = document.getElementById("send-container");
+const messageInput = document.getElementById("messageInp");
+const messageContainer = document.querySelector(".container")
+
+const Name = prompt("Enter your Name to join");
+
+socket.emit('new-user-join', Name);
+console.log("working link f")
+
+socket.on('user-joined',Name =>{
+    append(`${Name} joined the chat`,'right')
+});
+
+socket.on('receive',data=>{
+    append(`${data.Name}:${data.message}`,'left');
+})
+
+socket.on('left',Name=>{
+    append(`${Name} left the chat`,'left')
+})
+
+form.addEventListener('submit',(e)=>{
+    e.preventDefault();
+    const message = messageInput.value;
+    append(`You:${message}`,'right');
+    window.scrollTo(0, document.body.scrollHeight);
+    socket.emit('send',message);
+    messageInput.value = '';
+})
+
+const append=(message,position)=>{
+    const messageElement = document.createElement('div');
+    messageElement.innerText=message;
+    messageElement.classList.add('message');
+    messageElement.classList.add(position);
+    messageContainer.append(messageElement);
+    window.scrollTo(0, document.body.scrollHeight);
+}
+    </script>
+</body>
+</html>
